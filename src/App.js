@@ -150,31 +150,107 @@ import useLocalStorage, {
 
 // counter using redux
 import { useDispatch, useSelector } from 'react-redux';
+// create to do
 
 // types constants
-const INCREMENT = 'INCREMENT';
-const DECREMENT = 'DECREMENT';
+const ADD = 'ADD';
+const UPDATE = 'UPDATE';
+const DELETE = 'DELETE';
 const DEFAULT = 'DEFAULT';
+const CHANGE = 'CHANGE';
 
 // action creators
-const incremental = () => ({ type: INCREMENT });
-const decremental = () => ({ type: DECREMENT });
+const adder = (payload) => ({ type: ADD, payload: payload });
+const updater = (payload) => ({ type: UPDATE, payload: payload });
+const deleter = (payload) => ({ type: DELETE, payload: payload });
+
+const changer = (id) => ({ type: CHANGE, id: id });
+
 const reset = () => ({ type: DEFAULT });
 
 export default function App() {
-  const counter = useSelector((state) => state.counter);
+  const items = useSelector((state) => state.tasks);
+  const change = useSelector((state) => state.change);
+  const changeId = useSelector((state) => state.id);
+
   const dispatch = useDispatch();
+
+  const listEls = items.map((item, index) => (
+    <div>
+      {item.task}
+      <br />{' '}
+      <button
+        type="button"
+        onClick={() => {
+          dispatch(
+            updater({ id: item.id, task: dispatch(() => changing(item.task)) }),
+          );
+          dispatch(changer());
+        }}
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        onClick={() => dispatch(deleter({ task: item.task, id: item.id }))}
+      >
+        Delete
+      </button>
+    </div>
+  ));
+
+  const changing = (task) => {
+    const el = document.getElementById('input');
+    el.value = task;
+    return el.value;
+  };
+  const changings = () => {
+    const el = document.getElementById('input');
+    return el.value;
+  };
 
   return (
     <>
-      <h3>Counter: {counter}</h3>
-      <button type="button" onClick={() => dispatch(incremental())}>
-        INCREMENT
-      </button>
-      <br />
-      <button type="button" onClick={() => dispatch(decremental())}>
-        DECREMENT
-      </button>
+      <h3>Items:</h3>
+      <div>{listEls}</div>
+      <input type="text" id="input" />
+      {!change ? (
+        <button
+          type="button"
+          onClick={() => {
+            const el = document.getElementById('input');
+            if (el.value === '') {
+              return;
+            }
+            dispatch(
+              adder({ task: dispatch(() => changings()), id: listEls.length }),
+            );
+            el.value = '';
+          }}
+        >
+          Add
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => {
+            const el = document.getElementById('input');
+            if (el.value === '') {
+              return;
+            }
+            dispatch(
+              updater({
+                task: dispatch(() => changings()),
+                id: changeId,
+              }),
+            );
+            el.value = '';
+            dispatch(changer());
+          }}
+        >
+          Save edit
+        </button>
+      )}
       <br />
       <button onClick={() => dispatch(reset())}>RESET</button>
     </>
