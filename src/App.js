@@ -150,42 +150,37 @@ import useLocalStorage, {
 
 // counter using redux
 import { useDispatch, useSelector } from 'react-redux';
-// create to do
+import { useEffect } from 'react';
+import fetchData from './actions';
+import {
+  adder,
+  reseter,
+  updater,
+  deleter,
+  changer,
+  defaulter,
+  initer,
+} from './reducer';
 
-// types constants
-const ADD = 'ADD';
-const UPDATE = 'UPDATE';
-const DELETE = 'DELETE';
 const DEFAULT = 'DEFAULT';
-const CHANGE = 'CHANGE';
-
-// action creators
-const adder = (payload) => ({ type: ADD, payload: payload });
-const updater = (payload) => ({ type: UPDATE, payload: payload });
-const deleter = (payload) => ({ type: DELETE, payload: payload });
-
-const changer = (id) => ({ type: CHANGE, id: id });
-
 const reset = () => ({ type: DEFAULT });
 
 export default function App() {
-  const items = useSelector((state) => state.tasks);
-  const change = useSelector((state) => state.change);
-  const changeId = useSelector((state) => state.id);
+  const { tasks, id } = useSelector((state) => state.items);
+  const change = useSelector((state) => state.updates.change);
+  const { data, loading } = useSelector((state) => state.dataLoader);
 
   const dispatch = useDispatch();
 
-  const listEls = items.map((item, index) => (
+  const listEls = tasks.map((item, index) => (
     <div>
       {item.task}
       <br />{' '}
       <button
         type="button"
         onClick={() => {
-          dispatch(
-            updater({ id: item.id, task: dispatch(() => changing(item.task)) }),
-          );
-          dispatch(changer());
+          dispatch(updater({ id: item.id, task: changing(item.task) }));
+          if (!change) dispatch(changer(item.id));
         }}
       >
         Edit
@@ -222,9 +217,7 @@ export default function App() {
             if (el.value === '') {
               return;
             }
-            dispatch(
-              adder({ task: dispatch(() => changings()), id: listEls.length }),
-            );
+            dispatch(adder({ task: changings(), id: listEls.length }));
             el.value = '';
           }}
         >
@@ -240,19 +233,38 @@ export default function App() {
             }
             dispatch(
               updater({
-                task: dispatch(() => changings()),
-                id: changeId,
+                task: changings(),
+                id: id,
               }),
             );
             el.value = '';
-            dispatch(changer());
+            dispatch(changer(id));
           }}
         >
           Save edit
         </button>
       )}
       <br />
-      <button onClick={() => dispatch(reset())}>RESET</button>
+      <button
+        onClick={() => {
+          dispatch(reseter());
+          dispatch(defaulter());
+          dispatch(initer());
+        }}
+      >
+        RESET
+      </button>
+
+      <div>
+        <h2>Loading status: {`${loading}`}</h2>
+        <p>
+          Loaded data:{' '}
+          {data.length
+            ? data.map((el) => <li>{el['transliteration']}</li>)
+            : ''}
+        </p>
+        <button onClick={() => dispatch(fetchData())}>Load Data</button>
+      </div>
     </>
   );
 }
