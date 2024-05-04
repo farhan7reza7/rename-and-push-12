@@ -152,18 +152,15 @@ import useLocalStorage, {
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import fetchData from './actions';
-import {
-  adder,
-  reseter,
-  updater,
-  deleter,
-  changer,
-  defaulter,
-  initer,
-} from './reducer';
+import { adder, updater, deleter, changer } from './reducer';
 
-const DEFAULT = 'DEFAULT';
-const reset = () => ({ type: DEFAULT });
+const DEFAULT1 = 'tasks/DEFAULT';
+const DEFAULT2 = 'change/DEFAULT';
+const DEFAULT3 = 'data/DEFAULT';
+
+const reset1 = () => ({ type: DEFAULT1 });
+const reset2 = () => ({ type: DEFAULT2 });
+const reset3 = () => ({ type: DEFAULT3 });
 
 export default function App() {
   const { tasks, id } = useSelector((state) => state.items);
@@ -247,9 +244,9 @@ export default function App() {
       <br />
       <button
         onClick={() => {
-          dispatch(reseter());
-          dispatch(defaulter());
-          dispatch(initer());
+          dispatch(reset1());
+          dispatch(reset2());
+          dispatch(reset3());
         }}
       >
         RESET

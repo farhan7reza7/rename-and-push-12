@@ -21,17 +21,25 @@ const dataSlice1 = createSlice({
     deleter(state, action) {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
     },
-    reseter(state, action) {
+    /*reseter(state, action) {
       state.tasks = [];
       state.id = null;
-    },
+    },*/
   },
   extraReducers: (builder) => {
-    builder.addDefaultCase((state, action) => state);
+    builder
+      .addMatcher(
+        (action) => action.type.endsWith('/DEFAULT'),
+        (state, action) => {
+          state.tasks = [];
+          state.id = null;
+        },
+      )
+      .addDefaultCase((state, action) => state);
   },
 });
 
-export const { adder, reseter, updater, deleter } = dataSlice1.actions;
+export const { adder, updater, deleter } = dataSlice1.actions;
 const reducer1 = dataSlice1.reducer;
 
 const dataSlice2 = createSlice({
@@ -41,28 +49,35 @@ const dataSlice2 = createSlice({
     changer(state, action) {
       state.change = !state.change;
     },
-    defaulter(state, action) {
+    /*defaulter(state, action) {
       state.change = false;
-    },
+    },*/
   },
   extraReducers: (builder) => {
-    builder.addDefaultCase((state, action) => state);
+    builder
+      .addMatcher(
+        (action) => action.type.endsWith('/DEFAULT'),
+        (state, action) => {
+          state.change = false;
+        },
+      )
+      .addDefaultCase((state, action) => state);
   },
 });
 
-export const { changer, defaulter } = dataSlice2.actions;
+export const { changer } = dataSlice2.actions;
 const reducer2 = dataSlice2.reducer;
 
 const dataSlice3 = createSlice({
   name: 'data',
   initialState: loadAsyn,
-  reducers: {
+  /*reducers: {
     initer(state, action) {
       state.data = [];
       state.error = null;
       state.loading = false;
     },
-  },
+  },*/
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.pending, (state) => {
@@ -79,6 +94,14 @@ const dataSlice3 = createSlice({
         state.error = null;
         state.data = action.payload;
       })
+      .addMatcher(
+        (action) => action.type.endsWith('/DEFAULT'),
+        (state, action) => {
+          state.data = [];
+          state.error = null;
+          state.loading = false;
+        },
+      )
       .addDefaultCase((state, action) => {
         return state;
       });
@@ -87,5 +110,4 @@ const dataSlice3 = createSlice({
 
 const reducer3 = dataSlice3.reducer;
 
-export const { initer } = dataSlice3.actions;
 export { reducer1, reducer2, reducer3 };
