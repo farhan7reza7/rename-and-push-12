@@ -1,6 +1,6 @@
 // store.js
 import { configureStore } from '@reduxjs/toolkit';
-import { reducer1, reducer2, reducer3 } from './reducer';
+import { reducer1, reducer2, reducer3, init } from './reducer';
 // store
 const store = configureStore({
   reducer: {
@@ -8,6 +8,7 @@ const store = configureStore({
     updates: reducer2,
     dataLoader: reducer3,
   },
+  preloadedState: init,
 });
 
 export default store;

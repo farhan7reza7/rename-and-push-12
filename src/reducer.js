@@ -1,50 +1,63 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
 import fetchData from './actions';
 
-const initState = { tasks: [], id: null };
-const changeStat = { change: false };
-const loadAsyn = { data: [], error: null, loading: false };
+const initState = createEntityAdapter();
+
+const init = {
+  initState: initState.getInitialState({ id: null }),
+  changeStat: { change: false },
+  loadAsyn: { data: [], error: null, loading: false },
+};
 
 const dataSlice1 = createSlice({
   name: 'tasks',
-  initialState: initState,
+  initialState: init.initState,
   reducers: {
-    adder(state, action) {
+    /*adder(state, action) {
       state.tasks.push(action.payload);
-    },
+    },*/
+    adder: initState.addOne,
     updater(state, action) {
-      state.tasks = state.tasks.map((task) =>
-        task.id === action.payload.id ? action.payload : task,
-      );
+      //state.tasks = state.tasks.map((task) =>
+      //task.id === action.payload.id ? action.payload : task,
+      //);
+      state.entities[action.payload.id] = action.payload;
       state.id = action.payload.id;
     },
-    deleter(state, action) {
-      state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
-    },
+
+    /*deleter(state, action) {
+      delete state.entities[action.payload.id];
+    },*/
+    deleter: initState.removeOne,
     /*reseter(state, action) {
       state.tasks = [];
       state.id = null;
     },*/
+    reseter: initState.removeAll,
   },
   extraReducers: (builder) => {
     builder
-      .addMatcher(
-        (action) => action.type.endsWith('/DEFAULT'),
+      /*.addMatcher(
+        (action) => action.type.endsWith('DEFAULT'),
         (state, action) => {
-          state.tasks = [];
+          state.entities = { null: { id: null } };
           state.id = null;
         },
-      )
+      )*/
       .addDefaultCase((state, action) => state);
   },
 });
 
-export const { adder, updater, deleter } = dataSlice1.actions;
+export const { adder, updater, deleter, reseter } = dataSlice1.actions;
+export const { selectAll: selectAllEls } = initState.getSelectors(
+  (state) => state.items,
+);
+
 const reducer1 = dataSlice1.reducer;
 
 const dataSlice2 = createSlice({
   name: 'change',
-  initialState: changeStat,
+  initialState: init.changeStat,
   reducers: {
     changer(state, action) {
       state.change = !state.change;
@@ -56,7 +69,7 @@ const dataSlice2 = createSlice({
   extraReducers: (builder) => {
     builder
       .addMatcher(
-        (action) => action.type.endsWith('/DEFAULT'),
+        (action) => action.type.endsWith('DEFAULT'),
         (state, action) => {
           state.change = false;
         },
@@ -70,7 +83,7 @@ const reducer2 = dataSlice2.reducer;
 
 const dataSlice3 = createSlice({
   name: 'data',
-  initialState: loadAsyn,
+  initialState: init.loadAsyn,
   /*reducers: {
     initer(state, action) {
       state.data = [];
@@ -86,7 +99,7 @@ const dataSlice3 = createSlice({
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload.message;
         state.data = [];
       })
       .addCase(fetchData.fulfilled, (state, action) => {
@@ -95,7 +108,7 @@ const dataSlice3 = createSlice({
         state.data = action.payload;
       })
       .addMatcher(
-        (action) => action.type.endsWith('/DEFAULT'),
+        (action) => action.type.endsWith('DEFAULT'),
         (state, action) => {
           state.data = [];
           state.error = null;
@@ -110,4 +123,4 @@ const dataSlice3 = createSlice({
 
 const reducer3 = dataSlice3.reducer;
 
-export { reducer1, reducer2, reducer3 };
+export { reducer1, reducer2, reducer3, init };

@@ -150,26 +150,40 @@ import useLocalStorage, {
 
 // counter using redux
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
 import fetchData from './actions';
-import { adder, updater, deleter, changer } from './reducer';
+import {
+  adder,
+  updater,
+  deleter,
+  changer,
+  selectAllEls,
+  reseter,
+} from './reducer';
+import { createSelector } from 'reselect';
 
-const DEFAULT1 = 'tasks/DEFAULT';
-const DEFAULT2 = 'change/DEFAULT';
-const DEFAULT3 = 'data/DEFAULT';
+const DEFAULT = 'DEFAULT';
 
-const reset1 = () => ({ type: DEFAULT1 });
-const reset2 = () => ({ type: DEFAULT2 });
-const reset3 = () => ({ type: DEFAULT3 });
+const reset = () => ({ type: DEFAULT });
 
 export default function App() {
-  const { tasks, id } = useSelector((state) => state.items);
+  const { id } = useSelector((state) => state.items);
   const change = useSelector((state) => state.updates.change);
   const { data, loading } = useSelector((state) => state.dataLoader);
 
+  const tasksS = createSelector(
+    (state) => state.items,
+    (data) => data.tasks,
+  );
+
+  let taskss = useSelector(selectAllEls);
+
+  //console.log(taskss);
+
   const dispatch = useDispatch();
 
-  const listEls = tasks.map((item, index) => (
+  //const taskss = useSelector(tasksS);
+
+  const listEls = taskss.map((item, index) => (
     <div>
       {item.task}
       <br />{' '}
@@ -177,15 +191,12 @@ export default function App() {
         type="button"
         onClick={() => {
           dispatch(updater({ id: item.id, task: changing(item.task) }));
-          if (!change) dispatch(changer(item.id));
+          if (!change) dispatch(changer());
         }}
       >
         Edit
       </button>
-      <button
-        type="button"
-        onClick={() => dispatch(deleter({ task: item.task, id: item.id }))}
-      >
+      <button type="button" onClick={() => dispatch(deleter(item.id))}>
         Delete
       </button>
     </div>
@@ -203,7 +214,7 @@ export default function App() {
 
   return (
     <>
-      <h3>Items:</h3>
+      <h3>Elements:</h3>
       <div>{listEls}</div>
       <input type="text" id="input" />
       {!change ? (
@@ -235,7 +246,7 @@ export default function App() {
               }),
             );
             el.value = '';
-            dispatch(changer(id));
+            dispatch(changer());
           }}
         >
           Save edit
@@ -244,9 +255,8 @@ export default function App() {
       <br />
       <button
         onClick={() => {
-          dispatch(reset1());
-          dispatch(reset2());
-          dispatch(reset3());
+          dispatch(reset());
+          dispatch(reseter());
         }}
       >
         RESET
