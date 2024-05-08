@@ -21,7 +21,11 @@ const dataSlice1 = createSlice({
       //state.tasks = state.tasks.map((task) =>
       //task.id === action.payload.id ? action.payload : task,
       //);
-      state.entities[action.payload.id] = action.payload;
+      initState.updateOne(state, {
+        id: action.payload.id,
+        changes: action.payload,
+      });
+      //state.entities[action.payload.id] = action.payload;
       state.id = action.payload.id;
     },
 
@@ -33,25 +37,30 @@ const dataSlice1 = createSlice({
       state.tasks = [];
       state.id = null;
     },*/
-    reseter: initState.removeAll,
+    //reseter: initState.removeAll,
   },
   extraReducers: (builder) => {
     builder
-      /*.addMatcher(
+      .addMatcher(
         (action) => action.type.endsWith('DEFAULT'),
         (state, action) => {
-          state.entities = { null: { id: null } };
+          state.entities = {};
+          state.ids = [];
           state.id = null;
         },
-      )*/
+      )
       .addDefaultCase((state, action) => state);
   },
 });
 
-export const { adder, updater, deleter, reseter } = dataSlice1.actions;
-export const { selectAll: selectAllEls } = initState.getSelectors(
-  (state) => state.items,
-);
+export const { adder, updater, deleter } = dataSlice1.actions;
+export const {
+  selectAll: selectAllEls,
+  selectById,
+  selectEntities,
+  selectIds,
+  selectTotal,
+} = initState.getSelectors((state) => state.items);
 
 const reducer1 = dataSlice1.reducer;
 

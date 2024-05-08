@@ -149,16 +149,11 @@ import useLocalStorage, {
 }*/
 
 // counter using redux
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import fetchData from './actions';
-import {
-  adder,
-  updater,
-  deleter,
-  changer,
-  selectAllEls,
-  reseter,
-} from './reducer';
+import { adder, updater, deleter, changer, selectAllEls } from './reducer';
 import { createSelector } from 'reselect';
 
 const DEFAULT = 'DEFAULT';
@@ -212,65 +207,157 @@ export default function App() {
     return el.value;
   };
 
+  const handleSubmitting = useCallback(
+    (values, { setSubmitting, setErrors, setStatus, resetForm }) => {
+      try {
+        setSubmitting(true);
+        setStatus('submitting ...');
+        if (values.email !== 'eww@fdf') {
+          // Set an error message for the email field
+          setErrors({ email: 'Invalid email address' });
+          // Set form-wide status message
+          setStatus('Failed to submit form');
+        } else {
+          setErrors({});
+          setStatus('all okay');
+        }
+        setTimeout(() => {
+          alert(JSON.stringify(values, null, 2));
+          setSubmitting(false);
+          resetForm();
+        }, 400);
+      } catch (error) {
+        setErrors({ password: 'an error occurred' + error.message });
+        setStatus('error occurred');
+      }
+    },
+    [],
+  );
+
   return (
     <>
-      <h3>Elements:</h3>
-      <div>{listEls}</div>
-      <input type="text" id="input" />
-      {!change ? (
-        <button
-          type="button"
-          onClick={() => {
-            const el = document.getElementById('input');
-            if (el.value === '') {
-              return;
-            }
-            dispatch(adder({ task: changings(), id: listEls.length }));
-            el.value = '';
-          }}
-        >
-          Add
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => {
-            const el = document.getElementById('input');
-            if (el.value === '') {
-              return;
-            }
-            dispatch(
-              updater({
-                task: changings(),
-                id: id,
-              }),
-            );
-            el.value = '';
-            dispatch(changer());
-          }}
-        >
-          Save edit
-        </button>
-      )}
-      <br />
-      <button
-        onClick={() => {
-          dispatch(reset());
-          dispatch(reseter());
-        }}
-      >
-        RESET
-      </button>
-
       <div>
-        <h2>Loading status: {`${loading}`}</h2>
-        <p>
-          Loaded data:{' '}
-          {data.length
-            ? data.map((el) => <li>{el['transliteration']}</li>)
-            : ''}
-        </p>
-        <button onClick={() => dispatch(fetchData())}>Load Data</button>
+        <h4>Values:</h4>
+        <div>{listEls}</div>
+        <input type="text" id="input" />
+        {!change ? (
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('input');
+              if (el.value === '') {
+                return;
+              }
+              dispatch(adder({ task: changings(), id: listEls.length }));
+              el.value = '';
+            }}
+          >
+            Add
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('input');
+              if (el.value === '') {
+                return;
+              }
+              dispatch(
+                updater({
+                  task: changings(),
+                  id: id,
+                }),
+              );
+              el.value = '';
+              dispatch(changer());
+            }}
+          >
+            Save edit
+          </button>
+        )}
+        <br />
+        <button
+          onClick={() => {
+            dispatch(reset());
+          }}
+        >
+          RESET
+        </button>
+
+        <div>
+          <h4>Loading status: {`${loading}`}</h4>
+          <p>
+            Loaded data:{' '}
+            {data.length
+              ? data.map((el) => <li>{el['transliteration']}</li>)
+              : ''}
+          </p>
+          <button onClick={() => dispatch(fetchData())}>Load Data</button>
+        </div>
+      </div>
+      <div>
+        <Formik
+          initialValues={{ email: 'eww@fdf', password: '' }}
+          /*validationSchema={Yup.object({*/
+          validationSchema={Yup.object().shape({
+            email: Yup.string('email should be string ')
+              .email('invalid email')
+              .required('Field is required'),
+            password: Yup.string('password should be string').required(
+              'required filed',
+            ),
+          })}
+          onSubmit={handleSubmitting}
+        >
+          {({
+            values,
+            isSubmitting,
+            handleSubmit,
+            touched,
+            setFieldTouched,
+            setFieldValue,
+          }) => (
+            <>
+              <Form onSubmit={handleSubmit}>
+                <div>
+                  <label htmlFor="email">Email</label>
+                  <Field type="email" name="email" id="email" />
+                  <ErrorMessage name="email" component="div" />
+                </div>
+                <div>
+                  <label htmlFor>Password</label>
+                  <Field type="password" name="password" id="password" />
+                  <ErrorMessage name="password" component="div" />
+                </div>
+                <button type="submit" disabled={isSubmitting}>
+                  Submit
+                </button>
+              </Form>
+              <div>
+                email: {values.email}
+                <br />
+                password: {values.password}
+              </div>
+              <div>
+                email status: {touched.email && <span>email toucehd</span>}
+                <br />
+                password status:{' '}
+                {touched.password && <span>password touched</span>}
+              </div>
+              <div>
+                <button onClick={() => setFieldValue('email', 'adsdsdw@ddfd')}>
+                  Set email value
+                </button>
+              </div>
+              <br />
+              <div>
+                <button onClick={() => setFieldTouched('password', true)}>
+                  Set password touched
+                </button>
+              </div>
+            </>
+          )}
+        </Formik>
       </div>
     </>
   );
