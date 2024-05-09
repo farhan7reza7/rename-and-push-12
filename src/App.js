@@ -149,7 +149,7 @@ import useLocalStorage, {
 }*/
 
 // counter using redux
-import { Formik, Form, Field, ErrorMessage, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import fetchData from './actions';
@@ -171,8 +171,6 @@ export default function App() {
   );
 
   let taskss = useSelector(selectAllEls);
-
-  //console.log(taskss);
 
   const dispatch = useDispatch();
 
@@ -207,48 +205,42 @@ export default function App() {
     return el.value;
   };
 
-  const handleSubmitting = useCallback(
-    (
-      values,
-      { setSubmitting, setErrors, setStatus, resetForm, setFieldTouched },
-    ) => {
-      try {
-        setSubmitting(true);
-        setStatus('submitting ...');
-        Object.keys(values).forEach((field) => {
-          setFieldTouched(field, false);
-        });
-        if (values.email !== 'eww@fdf') {
-          // Set an error message for the email field
-          setErrors({ email: 'Invalid email address' });
-          // Set form-wide status message
-          setStatus('Failed to submit form');
-        } else {
-          setErrors({});
-          setStatus('all okay');
-        }
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          setSubmitting(false);
-          resetForm();
-        }, 400);
-      } catch (error) {
-        setErrors({ password: 'an error occurred' + error.message });
-        setStatus('error occurred');
-      }
-    },
-    [],
-  );
+  const handleSubmitting = useCallback(async (values, formik) => {
+    formik.setSubmitting(true);
+    formik.setStatus('submitting ...');
+
+    if (values.email !== 'eww@fdf') {
+      // Set an error message for the email field
+      formik.setErrors({ email: 'Invalid email address' });
+      // Set form-wide status message
+      formik.setStatus('Error, email not correct...');
+      formik.setSubmitting(false);
+      return;
+    } else {
+      formik.setErrors({});
+      formik.setStatus('Processing');
+    }
+
+    try {
+      formik.setStatus('Succeed');
+      Object.keys(values).forEach((field) => {
+        formik.setFieldTouched(field, false, false);
+      });
+      setTimeout(() => {
+        alert(JSON.stringify(values, null, 2));
+        formik.setSubmitting(false);
+        formik.resetForm();
+      }, 400);
+    } catch (error) {
+      formik.setStatus('error in form submission');
+    }
+  }, []);
 
   const formik = useFormik({
     initialValues: { email: 'eww@fdf', password: '' },
     validationSchema: Yup.object().shape({
-      email: Yup.string('email should be string ')
-        .email('invalid email')
-        .required('Field is required'),
-      password: Yup.string('password should be string').required(
-        'required filed',
-      ),
+      email: Yup.string().email('invalid email').required('Field is required'),
+      password: Yup.string().required('required filed'),
     }),
     onSubmit: handleSubmitting,
   });
@@ -271,7 +263,7 @@ export default function App() {
               el.value = '';
             }}
           >
-            Add
+            Integ
           </button>
         ) : (
           <button
@@ -326,10 +318,12 @@ export default function App() {
               value={formik.values.email}
               onBlur={formik.handleBlur}
             />
-            <div>{formik.errors.email}</div>
+            {formik.touched.email && formik.errors.email && (
+              <div>{formik.errors.email}</div>
+            )}
           </div>
           <div>
-            <label htmlFor>Password</label>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               name="password"
@@ -338,19 +332,30 @@ export default function App() {
               value={formik.values.password}
               onBlur={formik.handleBlur}
             />
-            <div>{formik.errors.password}</div>
+            {formik.touched.password && formik.errors.password ? (
+              <div>{formik.errors.password}</div>
+            ) : null}
           </div>
-          <button type="submit" disabled={formik.isSubmitting}>
+          <button
+            type="submit"
+            disabled={formik.isSubmitting || !formik.isValid}
+          >
             Submit
           </button>
+          {formik.status && <div>Submission status: {formik.status}</div>}
+          {formik.isValidating && <div>Validating...</div>}
+          {!formik.isValid && (
+            <div>Form Status: form not valid, fill correctly</div>
+          )}
         </form>
+
         <div>
           email: {formik.values.email}
           <br />
           password: {formik.values.password}
         </div>
         <div>
-          email status: {formik.touched.email && <span>email toucehd</span>}
+          email status: {formik.touched.email && <span>email touched</span>}
           <br />
           password status:{' '}
           {formik.touched.password && <span>password touched</span>}
@@ -362,7 +367,9 @@ export default function App() {
         </div>
         <br />
         <div>
-          <button onClick={() => formik.setFieldTouched('password', true)}>
+          <button
+            onClick={() => formik.setFieldTouched('password', true, false)}
+          >
             Set password touched
           </button>
         </div>
