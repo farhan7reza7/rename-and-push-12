@@ -80,7 +80,6 @@ String.prototype.toTitleCase = function () {
     .join(' ');
 };
 */
-import { useCallback } from 'react';
 import useLocalStorage, {
   useMediaQuery,
   useForm,
@@ -149,12 +148,14 @@ import useLocalStorage, {
 }*/
 
 // counter using redux
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import fetchData from './actions';
 import { adder, updater, deleter, changer, selectAllEls } from './reducer';
 import { createSelector } from 'reselect';
+import { List, Grid, Table, Column } from 'react-virtualized';
 
 const DEFAULT = 'DEFAULT';
 
@@ -297,13 +298,14 @@ export default function App() {
 
         <div>
           <h4>Loading status: {`${loading}`}</h4>
-          <p>
+          {/*<p>
             Loaded data:{' '}
             {data.length
               ? data.map((el) => <li>{el['transliteration']}</li>)
-              : ''}
-          </p>
+            : ''}
+          </p>*/}
           <button onClick={() => dispatch(fetchData())}>Load Data</button>
+          <ListRenderer data={data} />
         </div>
       </div>
       <div>
@@ -377,3 +379,187 @@ export default function App() {
     </>
   );
 }
+
+const ListRenderer = memo(({ data }) => {
+  const RowRenderer = useCallback(
+    ({ index, key, style }) => (
+      <div
+        key={key}
+        style={{
+          ...style,
+          backgroundColor: index % 2 ? 'aliceblue' : 'white',
+          padding: '15px',
+        }}
+      >
+        {data[index]['transliteration']}
+      </div>
+    ),
+    [data],
+  );
+  const gridData = useMemo(
+    () =>
+      Array.from({ length: 10000 }, (el, index) => ({
+        id: index + 1,
+        description: `item ${index + 1} description`,
+        name: `item ${index + 1}`,
+      })),
+    [],
+  );
+
+  const gridData2 = useMemo(
+    () =>
+      Array.from({ length: 10000 }, (el, index) => [
+        index + 1,
+        `item ${index + 1} description`,
+        `item ${index + 1}`,
+      ]),
+    [],
+  );
+
+  const renderCell = useCallback(
+    ({ columnIndex, key, rowIndex, style }) => (
+      <div
+        key={key}
+        style={{
+          ...style,
+          backgroundColor: rowIndex % 2 ? 'aliceblue' : 'white',
+          padding: '15px',
+        }}
+      >
+        {gridData[rowIndex][columnIndex]}
+      </div>
+    ),
+    [gridData],
+  );
+
+  const reffered = useRef(null);
+  const reffered2 = useRef(null);
+  const reffered3 = useRef(null);
+
+  return (
+    <>
+      <div
+        ref={reffered}
+        style={{
+          backgroundColor: 'gray',
+          border: '1px solid #111',
+          width: '100%',
+        }}
+      >
+        <List
+          width={reffered.current ? reffered.current.offsetWidth : 0}
+          //width={400}
+          height={300}
+          rowCount={data.length}
+          rowHeight={50}
+          rowRenderer={RowRenderer}
+          style={listStyle}
+        />
+      </div>
+      <br />
+      <div
+        ref={reffered2}
+        style={{
+          backgroundColor: 'gray',
+          border: '1px solid #111',
+          width: '100%',
+        }}
+      >
+        <Grid
+          //width={reffered2.current ? reffered2.current.offsetWidth : 0}
+          width={600}
+          height={300}
+          rowCount={gridData2.length}
+          rowHeight={50}
+          columnCount={3}
+          columnWidth={200}
+          cellRenderer={({ columnIndex, key, rowIndex, style }) => (
+            <div
+              key={key}
+              style={{
+                ...style,
+                backgroundColor: rowIndex % 2 ? 'aliceblue' : 'white',
+                padding: '15px',
+              }}
+            >
+              {gridData2[rowIndex][columnIndex]}
+            </div>
+          )}
+          style={{
+            padding: '15px',
+            backgroundColor: '#fff',
+            border: '2px solid lightblue',
+            borderRadius: '10px',
+            color: '#111',
+          }}
+        />
+      </div>
+      <div
+        ref={reffered3}
+        style={{
+          backgroundColor: 'gray',
+          border: '1px solid #111',
+          width: '100%',
+        }}
+      >
+        <Table
+          //width={reffered2.current ? reffered2.current.offsetWidth : 0}
+          width={600}
+          height={300}
+          headerHeight={50}
+          rowCount={gridData.length}
+          rowHeight={50}
+          rowGetter={({ index }) => gridData[index]}
+          style={{
+            padding: '15px',
+            backgroundColor: '#fff',
+            border: '2px solid lightblue',
+            borderRadius: '10px',
+            color: '#111',
+          }}
+        >
+          <Column
+            label="ID"
+            dataKey="id"
+            width={200}
+            style={{
+              display: 'inline-block',
+              textAlign: 'center',
+              padding: '20px',
+              backgroundColor: 'lightblue',
+            }}
+          />
+          <Column
+            label="NAME"
+            dataKey="name"
+            width={200}
+            style={{
+              display: 'inline-block',
+              textAlign: 'center',
+              padding: '20px',
+              backgroundColor: 'white',
+            }}
+          />
+          <Column
+            label="DESCRIPTION"
+            dataKey="description"
+            width={200}
+            style={{
+              display: 'inline-block',
+              textAlign: 'center',
+              padding: '20px',
+              backgroundColor: 'lightblue',
+            }}
+          />
+        </Table>
+      </div>
+    </>
+  );
+});
+
+const listStyle = {
+  padding: '15px',
+  backgroundColor: '#fff',
+  border: '2px solid lightblue',
+  borderRadius: '10px',
+};
