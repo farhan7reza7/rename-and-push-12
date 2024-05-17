@@ -1268,9 +1268,53 @@ const Animation = memo(() => {
         <animated.div style={blink}>
           <Marquee style={{ color: 'red' }}>
             moving from left to right 1moving from left to right moving from
-            left to right 1moving from left to right moving from left to right
-            1moving from left to right moving from left to right 1moving from
-            left to right moving from left to right 1moving from left to right
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
           </Marquee>
         </animated.div>
       </div>
@@ -1278,15 +1322,27 @@ const Animation = memo(() => {
   );
 });
 
-const Marquee = ({ children, style = {}, time = 25000 }) => {
+const Marquee = ({ children, style = {}, scrollAmount = 10, time = 25000 }) => {
   const contentRef = useRef(null);
   const [contentWidth, setContentWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
-    if (contentRef.current) {
-      setContentWidth(contentRef.current.getBoundingClientRect().width);
-    }
-  }, [contentRef]);
+    const handleResize = () => {
+      if (contentRef.current) {
+        setContentWidth(contentRef.current.getBoundingClientRect().width);
+        setContainerWidth(
+          contentRef.current.parentElement.getBoundingClientRect().width,
+        );
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const scrolling = useSpring({
     from: {
@@ -1297,12 +1353,9 @@ const Marquee = ({ children, style = {}, time = 25000 }) => {
     },
 
     config: {
-      duration:
-        time !== 25000
-          ? time
-          : contentWidth
-            ? Math.floor(contentWidth / 100) * 20000
-            : time,
+      duration: contentWidth
+        ? ((contentWidth + containerWidth) / scrollAmount) * 1000
+        : time,
     },
     loop: true,
   });
@@ -1314,7 +1367,6 @@ const Marquee = ({ children, style = {}, time = 25000 }) => {
         style={{
           ...scrolling,
           padding: '10px',
-          width: '100%',
           whiteSpace: 'nowrap',
           fontFamily: 'sans-serif',
           ...style,
