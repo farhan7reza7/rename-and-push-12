@@ -1266,54 +1266,7 @@ const Animation = memo(() => {
         }}
       >
         <animated.div style={blink}>
-          <Marquee style={{ color: 'red' }}>
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
-            moving from left to right 1moving from left to right moving from
+          <Marquee>
             moving from left to right 1moving from left to right moving from
           </Marquee>
         </animated.div>
@@ -1322,7 +1275,13 @@ const Animation = memo(() => {
   );
 });
 
-const Marquee = ({ children, style = {}, scrollAmount = 10, time = 25000 }) => {
+// not start just after visible end,not end just at visible end, only one time applicable later very delayed
+const Marquee = ({
+  children,
+  style = { color: 'red' },
+  scrollAmount = 20,
+  time = 25000,
+}) => {
   const contentRef = useRef(null);
   const [contentWidth, setContentWidth] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -1346,7 +1305,7 @@ const Marquee = ({ children, style = {}, scrollAmount = 10, time = 25000 }) => {
 
   const scrolling = useSpring({
     from: {
-      transform: 'translateX(100%)',
+      transform: `translateX(${containerWidth}px)`,
     },
     to: {
       transform: `translateX(-${contentWidth}px)`,
@@ -1366,6 +1325,7 @@ const Marquee = ({ children, style = {}, scrollAmount = 10, time = 25000 }) => {
         ref={contentRef}
         style={{
           ...scrolling,
+          display: 'inline-block',
           padding: '10px',
           whiteSpace: 'nowrap',
           fontFamily: 'sans-serif',
