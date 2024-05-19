@@ -1,10 +1,13 @@
 import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
-import fetchData from './actions';
+import fetchData, { editer } from './actions';
 
-const initState = createEntityAdapter();
+const initState = createEntityAdapter({
+  selectId: (task) => task.tid,
+  sortComparer: (a, b) => a.task.localeCompare(b.task), // compare alphabetically,
+});
 
 const init = {
-  initState: initState.getInitialState({ id: null }),
+  initState: initState.getInitialState({ tid: null }),
   changeStat: { change: false },
   loadAsyn: { data: [], error: null, loading: false },
 };
@@ -22,13 +25,16 @@ const dataSlice1 = createSlice({
       //task.id === action.payload.id ? action.payload : task,
       //);
       initState.updateOne(state, {
-        id: action.payload.id,
+        id: action.payload.tid,
         changes: action.payload,
       });
+      state.tid = null;
       //state.entities[action.payload.id] = action.payload;
-      state.id = action.payload.id;
+      //state.tid = action.payload.tid;
     },
-
+    /*editer(state, action) {
+      state.tid = action.payload.tid;
+    },*/
     /*deleter(state, action) {
       delete state.entities[action.payload.id];
     },*/
@@ -41,12 +47,15 @@ const dataSlice1 = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(editer, (state, action) => {
+        state.tid = action.payload.tid;
+      })
       .addMatcher(
         (action) => action.type.endsWith('DEFAULT'),
         (state, action) => {
           state.entities = {};
           state.ids = [];
-          state.id = null;
+          state.tid = null;
         },
       )
       .addDefaultCase((state, action) => state);

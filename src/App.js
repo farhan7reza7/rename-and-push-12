@@ -152,7 +152,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import fetchData from './actions';
+import fetchData, { editer } from './actions';
 import { adder, updater, deleter, changer, selectAllEls } from './reducer';
 import { createSelector } from 'reselect';
 import {
@@ -177,9 +177,8 @@ import {
 const DEFAULT = 'DEFAULT';
 
 const reset = () => ({ type: DEFAULT });
-
-export function App() {
-  const { id } = useSelector((state) => state.items);
+export default function App() {
+  const { tid } = useSelector((state) => state.items);
   const change = useSelector((state) => state.updates.change);
   const { data, loading } = useSelector((state) => state.dataLoader);
 
@@ -201,13 +200,14 @@ export function App() {
       <button
         type="button"
         onClick={() => {
-          dispatch(updater({ id: item.id, task: changing(item.task) }));
+          dispatch(editer({ tid: item.tid }));
+          changing(item.task);
           if (!change) dispatch(changer());
         }}
       >
         Edit
       </button>
-      <button type="button" onClick={() => dispatch(deleter(item.id))}>
+      <button type="button" onClick={() => dispatch(deleter(item.tid))}>
         Delete
       </button>
     </div>
@@ -278,7 +278,7 @@ export function App() {
               if (el.value === '') {
                 return;
               }
-              dispatch(adder({ task: changings(), id: listEls.length }));
+              dispatch(adder({ task: changings(), tid: listEls.length }));
               el.value = '';
             }}
           >
@@ -295,7 +295,7 @@ export function App() {
               dispatch(
                 updater({
                   task: changings(),
-                  id: id,
+                  tid: tid,
                 }),
               );
               el.value = '';
@@ -401,6 +401,12 @@ export function App() {
     </>
   );
 }
+/**
+ * -----REDUX-----
+ * react-redux(Provider), @reduxJs/toolkit(createSlice, createAsyncThunk for async logic, configureStore, createEntityAdapter)
+ *
+ *
+ */
 
 const ListRenderer = memo(({ data }) => {
   const RowRenderer = useCallback(
@@ -1310,7 +1316,6 @@ const Marquee = ({
     to: {
       transform: `translateX(-${contentWidth}px)`,
     },
-
     config: {
       duration: contentWidth
         ? ((contentWidth + containerWidth) / scrollAmount) * 1000
@@ -1330,6 +1335,7 @@ const Marquee = ({
           whiteSpace: 'nowrap',
           fontFamily: 'sans-serif',
           ...style,
+          color: containerWidth ? style.color : 'transparent',
         }}
       >
         {children}
@@ -1339,4 +1345,4 @@ const Marquee = ({
 };
 
 //export default Animation;
-export default AnimatableComponent;
+//export default AnimatableComponent;
