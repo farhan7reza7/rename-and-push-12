@@ -16,10 +16,18 @@ const dataSlice1 = createSlice({
   name: 'tasks',
   initialState: init.initState,
   reducers: {
-    /*adder(state, action) {
-      state.tasks.push(action.payload);
-    },*/
-    adder: initState.addOne,
+    adder(state, action) {
+      state.entities[action.payload.tid] = action.payload;
+      state.ids.push(action.payload.tid);
+
+      // Sort the ids array
+      state.ids.sort((a, b) => {
+        const taskA = state.entities[a];
+        const taskB = state.entities[b];
+        return taskA.task.localeCompare(taskB.task);
+      });
+    },
+    //adder: initState.addOne,
     updater(state, action) {
       //state.tasks = state.tasks.map((task) =>
       //task.id === action.payload.id ? action.payload : task,
@@ -28,13 +36,12 @@ const dataSlice1 = createSlice({
         id: action.payload.tid,
         changes: action.payload,
       });
-      state.tid = null;
       //state.entities[action.payload.id] = action.payload;
-      //state.tid = action.payload.tid;
     },
     /*editer(state, action) {
       state.tid = action.payload.tid;
     },*/
+
     /*deleter(state, action) {
       delete state.entities[action.payload.id];
     },*/
