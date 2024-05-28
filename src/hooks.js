@@ -72,8 +72,8 @@ export const useAsync = (asyncFunction) => {
         setLoading(true);
         const response = await asyncFunction();
         setData(response);
-      } catch (error) {
-        setError(error);
+      } catch (err) {
+        setError(err);
       } finally {
         setLoading(false);
       }

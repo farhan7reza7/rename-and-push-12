@@ -1,7 +1,35 @@
 body {
-    background-color: aqua;
-    color: #fff;
-    height: 100vh;
-    overflow: hidden;
-    margin: 0;
+  background-color: aliceblue;
+  color: #fff;
+  height: 100vh;
+  margin: 0;
+}
+
+div.component {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  font-size: large;
+  background-color: #dfeffe;
+  color: #111;
+}
+
+.mainHeader {
+  display: block;
+  height: 80px;
+  padding: 10px;
+  background-color: #fff;
+  color: #111;
+}
+
+ul {
+  list-style: none;
+}
+
+nav.mainHeader > ul > li {
+  display: inline;
+  margin-right: 10px;
+  background-color: cornflowerblue;
+  color: #fff;
 }
