@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(() => {
     setAuthenticated(true);
   }, []);
+
   const signup = useCallback(() => {
     setAuthenticated(true);
   }, []);

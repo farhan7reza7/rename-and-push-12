@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import EmailUs from './email';
 
 const Home = lazy(() => import('./home'));
 const Contact = lazy(() => import('./contact'));
@@ -35,6 +36,8 @@ const routesConfig = [
   { path: 'out', element: <LogOut /> },
   { path: 'up', element: <SignUp /> },
   { path: 'verify-email', element: <VerifyEmail /> },
+  { path: 'send-email', element: <EmailUs /> },
+
   { path: '*', element: <NotFound /> },
 ];
 export default routesConfig;

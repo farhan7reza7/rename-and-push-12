@@ -32,6 +32,12 @@ const NavBar = () => {
             <NavLink to="/out">Log Out</NavLink>
           </li>
         )}
+        <li>
+          <NavLink to="/verify-email">VerifyEm</NavLink>
+        </li>
+        <li>
+          <NavLink to="/send-email">EmailUs</NavLink>
+        </li>
       </ul>
     </nav>
   );
