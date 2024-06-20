@@ -40,28 +40,6 @@ const AppRoutes = () => {
               </Route>
             );
           })}
-
-          {/* <Route path="/" exact element={<Home />} />
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <About />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <ProtectedRoute>
-                <Contact />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/in" element={<LogIn />} />
-          <Route path="/out" element={<LogOut />} />
-          <Route path="/up" element={<SignUp />} />
-          <Route path="*" element={<NotFound />} />*/}
         </Routes>
       </Suspense>
     </>

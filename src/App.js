@@ -224,6 +224,7 @@ export function Apps() {
     el.value = task;
     return el.value;
   };
+
   const changings = () => {
     const el = document.getElementById('input');
     return el.value;
@@ -270,7 +271,7 @@ export function Apps() {
   });
 
   return (
-    <>
+    <div style={{ color: '#111', backgroundColor: '#fff' }}>
       <ParallaxWeb />
       <div>
         <h4>Values:</h4>
@@ -404,7 +405,7 @@ export function Apps() {
         <DynamicList />
       </div>
       <ParallaxWeb />
-    </>
+    </div>
   );
 }
 
@@ -727,10 +728,6 @@ const DynamicList = () => {
     </div>
   );
 };
-/**
- * style vs containerStyle
- *
- */
 
 function MyComponent() {
   const renderCount = useRef(0);
@@ -741,6 +738,7 @@ function MyComponent() {
   return (
     <div>
       <p>Render Count: {renderCount.current}</p>
+      <p>State count: {state}</p>
       <button onClick={() => setState((prevState) => prevState + 1)}>
         Increment State
       </button>
@@ -879,7 +877,7 @@ const ParallaxWeb = memo(() => {
   );
 });
 
-const AnimatableComponent = memo(() => {
+const AnimatableComponent = () => {
   // first fade using useSpring, button on click change fade and color, and scale as well
   const [clicked, setCliked] = useState(false);
   const buttonStyles = useSpring({
@@ -913,25 +911,30 @@ const AnimatableComponent = memo(() => {
 
   const SlideStyles = useSpring({
     to: [
-      /*{ transform: 'translateX(0px)' },
-      { transform: 'translateX(400px)' },
+      /*{ transform: 'translateX(400px)' },
       { transform: 'translateX(-100px)' },
       { transform: 'translateX(400px)' },
       { transform: 'translateX(0px)' },*/
 
-      { transform: 'translateX(400px) translateY(0px)' },
-      { transform: 'translateX(400px) translateY(100px)' },
-      { transform: 'translateX(-100px) translateY(100px)' },
+      { transform: 'translateY(0px) translateX(400px) ' },
+      { transform: 'translateY(100px) translateX(400px) ' },
+      { transform: 'translateY(100px) translateX(-100px) ' },
       { transform: 'translateY(-100px) translateX(-100px)' },
       { transform: 'translateY(-100px) translateX(400px)' },
       { transform: 'translateY(0px) translateX(400px)' },
       { transform: 'translateY(0px) translateX(0px)' },
+
+      { transform: 'translateY(0px) translateX(400px)' },
+      { transform: 'translateY(-100px) translateX(400px)' },
+      { transform: 'translateY(-100px) translateX(-100px)' },
+      { transform: 'translateY(100px) translateX(-100px)' },
+      { transform: 'translateY(100px) translateX(400px)' },
+      { transform: ' translateY(0px) translateX(400px)' },
+      { transform: 'translateY(0px) translateX(0px)' },
     ],
-    from: { transform: 'translateX(0px) translateY(0)' },
-    /*to: [{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }],
-    from: {
-      transform: 'scale(1)',
-    },*/
+    from: { transform: 'translateY(0) translateX(0px)' },
+    //from: { transform: 'translateX(0px)' },
+
     loop: true,
     config: config.slow,
   });
@@ -973,7 +976,7 @@ const AnimatableComponent = memo(() => {
   );
 
   return (
-    <>
+    <div style={{ color: '#111' }}>
       <animated.div style={{ ...fadding, height: '50px', color: '#111' }}>
         Fadding
       </animated.div>
@@ -998,8 +1001,8 @@ const AnimatableComponent = memo(() => {
         style={{
           opacity: buttonStyles.opacity.to((val) => val),
           transform: buttonStyles.scale.to((scale) => `scale(${scale})`),
-          //backgroundColor: buttonStyles.backgroundColor,
-          backgroundColor: buttonStyles.backgroundColor.to((prop) => prop),
+          backgroundColor: buttonStyles.backgroundColor,
+          //backgroundColor: buttonStyles.backgroundColor.to((prop) => prop),
           margin: '15px',
           color: '#fff',
           width: '100px',
@@ -1046,9 +1049,9 @@ const AnimatableComponent = memo(() => {
       <Transitioning />
       <KeyframeExample />
       <Animation />
-    </>
+    </div>
   );
-});
+};
 
 function Transitioning() {
   const [items, setItems] = useState([
@@ -1083,9 +1086,9 @@ function Transitioning() {
   const transRef = useSpringRef();
   const transitions1 = useTransition(data, {
     ref: transRef,
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
+    from: { opacity: 0, backgroundColor: 'blue' },
+    enter: { opacity: 1, backgroundColor: 'cyan' },
+    leave: { opacity: 0, backgroundColor: 'red' },
   });
 
   // Chain the animations
@@ -1113,16 +1116,16 @@ function Transitioning() {
         }}
       >
         {transitions1((style, item) => (
-          <div
+          <animated.div
+            key={item}
             style={{
               ...style,
               width: '50px',
               height: '20px',
-              backgroundColor: 'cyan',
             }}
           >
             {item}
-          </div>
+          </animated.div>
         ))}
       </animated.div>
     </>
@@ -1196,7 +1199,7 @@ const KeyframeExample = () => {
   );
 };
 
-const Animation = memo(() => {
+const Animation = () => {
   // nudge and pulse
   const nudge = useSpring({
     from: {
@@ -1274,14 +1277,18 @@ const Animation = memo(() => {
         <animated.div style={blink}>
           <Marquee>
             moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
+            moving from left to right 1moving from left to right moving from
           </Marquee>
         </animated.div>
       </div>
     </div>
   );
-});
+};
 
-// not start just after visible end,not end just at visible end, only one time applicable later very delayed
 const Marquee = ({
   children,
   style = { color: 'red' },
@@ -1335,7 +1342,11 @@ const Marquee = ({
           whiteSpace: 'nowrap',
           fontFamily: 'sans-serif',
           ...style,
-          color: containerWidth ? style.color : 'transparent',
+          color: containerWidth
+            ? style.color
+              ? style.color
+              : 'red'
+            : 'transparent',
         }}
       >
         {children}
@@ -1355,4 +1366,5 @@ const App = () => (
     </Router>
   </AuthProvider>
 );
+
 export default App;

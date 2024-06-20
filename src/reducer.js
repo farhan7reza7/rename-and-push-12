@@ -6,6 +6,14 @@ const initState = createEntityAdapter({
   sortComparer: (a, b) => a.task.localeCompare(b.task), // compare alphabetically,
 });
 
+export const {
+  selectAll: selectAllEls,
+  selectById,
+  selectEntities,
+  selectIds,
+  selectTotal,
+} = initState.getSelectors((state) => state.items);
+
 const init = {
   initState: initState.getInitialState({ tid: null }),
   changeStat: { change: false },
@@ -70,13 +78,6 @@ const dataSlice1 = createSlice({
 });
 
 export const { adder, updater, deleter } = dataSlice1.actions;
-export const {
-  selectAll: selectAllEls,
-  selectById,
-  selectEntities,
-  selectIds,
-  selectTotal,
-} = initState.getSelectors((state) => state.items);
 
 const reducer1 = dataSlice1.reducer;
 

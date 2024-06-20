@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/authContext';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const { register } = useAuth();
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/register', { email }); // Use relative path
+      const res = await register({ email }); // Use relative path
       //const response = await axios.get('api/test');
       //setMessage('Check your email for verification link ');
-      if (res.data === 'Success') {
+      /*if (res.data === 'Success') {
         navigate('/');
-      }
-      setMessage(res.data);
+      }*/
+      setMessage(res);
     } catch (error) {
-      setMessage('Registration failed. Please try again.');
+      setMessage('Registration failed, ' + error.message);
     }
   };
 
